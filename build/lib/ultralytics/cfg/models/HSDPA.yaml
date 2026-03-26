@@ -1,0 +1,51 @@
+# Image size = 640x640x3
+# output = min(max_channels, channel input)x width
+
+nc: 102     # number of classes
+scales:     # model C2f by True
+  # [depth, width, max_channels]
+  ex: [0.33, 1.00, 1024]
+
+# YOLOv8.l backbone
+backbone:
+  # [from, repeats, module, args]
+
+  - [-1, 1, CBS, [3, 64, 3, 2]]                     # 0:        320 x 320 x 64
+
+  - [-1, 1, Spatial_Attention, [64, 128]]           # 1:        160 x 160 x 128
+  - [-1, 6, C2f, [128, True]]                       # 2:        160 x 160 x 128   @1
+  
+  - [-1, 1, Spatial_Attention, [128, 256]]          # 3:        80 x 80 x 256
+  - [-1, 9, C2f, [256, True]]                       # 4:        80 x 80 x 256     @2
+
+  - [-1, 1, Spatial_Attention, [256, 512]]          # 5:        40 x 40 x 512
+  - [-1, 9, C2f, [512, True]]                       # 6:        40 x 40 x 512     @3
+
+  - [-1, 1, Spatial_Attention, [512, 1024]]         # 7:        20 x 20 x 1024
+  - [-1, 6, C2f, [1024, True]]                      # 8:        20 x 20 x 1024    @4
+
+  - [-1, 1, SPPF, [1024, 5]]                        # 9:        20 x 20 x 1024    @5
+  
+# YOLOv8.l head
+head:
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]      # 10:       40 x 40 x 1024
+  - [6, 1, Contigous_Att, [512, 1024]]              # 11:       40 x 40 x 1024
+  - [[-1, 10], 1, Concat, [1]]                      # 12:       (@2)40 x 40 x 2048
+  - [-1, 6, C2f, [512, True]]                       # 13:       (C2F) 40 x 40 x 512
+
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]      # 14:       80 x 80 x 512
+  - [4, 1, Contigous_Att, [256, 512]]               # 15:       80 x 80 x 512
+  - [[-1, 14], 1, Concat, [1]]                      # 16:       (@1) 80 x 80 x 1024
+  - [-1, 6, C2f, [256, True]]                       # 17:       80 x 80 x 256
+
+  - [-1, 1, Conv, [256, 3, 2]]                      # 18:       40 x 40 x 512
+  - [[-1, 13], 1, Concat, [1]]                      # 19:       (C2F)40 x 40 x 1024
+  - [-1, 6, C2f, [512, True]]                       # 20:       40 x 40 x 512
+
+  - [-1, 1, Conv, [512, 3, 2]]                      # 21:       20 x 20 x 1024
+  - [9, 1, Contigous_Att, [1024, 2048]]             # 22:       20 x 20 x 2048
+  - [[-1, 21], 1, Concat, [1]]                      # 23:       20 x 20 x 2560
+  - [-1, 6, C2f, [1024, True]]                      # 24:       20 x 20 x 1024
+
+  - [[17, 20, 24], 1, Detect, [nc]]                 # Detect (C2F, C2F, C2F)
+

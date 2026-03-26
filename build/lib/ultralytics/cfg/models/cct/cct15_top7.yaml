@@ -1,0 +1,33 @@
+nc: 1
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]                       # 0- 320x320x3
+  - [-1, 1, Spatial_Attention, [64, 128]]           # 1- 160x160x64
+  - [-1, 1, RepNCSPELAN4, [128, 128, 64, 1]]        # 2
+  - [-1, 1, Spatial_Attention, [128, 240]]          # 3-80 80x80x240
+  - [-1, 1, RepNCSPELAN4, [240, 240, 120, 1]]       # 4
+  - [-1, 1, Spatial_Attention, [240, 360]]          # 5-40 40x40x360
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]]       # 6
+  - [-1, 1, Spatial_Attention, [360, 480]]          # 7-20 20x20x480
+  - [-1, 1, RepNCSPELAN4, [480, 480, 240, 1]]       # 8
+  - [-1, 1, SPPELAN, [480, 240]]                    # 9 20x20x480
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 10 40x40x360
+  - [[-1, 6], 1, Concat, [1]]                       # 11
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]]       # 12
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 13 80x80x240
+  - [[-1, 4], 1, Concat, [1]]                       # 14
+  - [-1, 1, RepNCSPELAN4, [240, 240, 120, 1]]       # 15
+
+  - [-1, 1, AConv, [180]]                           # 16 40x40x180
+  - [[-1, 12], 1, Concat, [1]]                      # 17
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]]       # 18
+
+  - [-1, 1, AConv, [240]]                           # 19 20x20x240
+  - [[-1, 9], 1, Concat, [1]]                       # 20
+  - [-1, 1, RepNCSPELAN4, [480, 480, 240, 1]]       # 21
+
+  - [[12, 15, 17, 21], 1, Detect, [nc]]             # Detect
+

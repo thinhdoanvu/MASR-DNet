@@ -1,0 +1,55 @@
+# Image size = 640x640x3
+# output = min(max_channels, channel input)x width
+# Parameters
+nc: 1  # number of classes
+scales: # model C2f by True
+  # [depth, width, max_channels]: dung doi ten ex vi no anh huong den qua trinh pretrain, detect sau nay
+  #ex: [0.33, 1.00, 1024]   # summary: C2f: 6-9-9-6-6-6-6 398 layers, 79,594,441 parameters, 79,594,425 gradients, 199.8 GFLOPs (k4_3_7_13) ==> (IP102=69.7), (R2000=8x.y)
+#  n: [0.33, 1.00, 1024]    # Testing
+  #s: [0.25, 1.00, 1024]     # C2f: 3-3-3-3-3-3-3-3
+  m: [0.33, 1.00, 1024]    # hsdpa_v2
+  #x: [0.33, 1.00, 1024]    # C2f: 9-9-9-9-9-9-9-9
+# YOLOv8.l backbone
+backbone:
+  # [from, repeats, module, args]
+
+  - [-1, 1, CBS, [3, 64, 3, 2]]                     # 0:        320 x 320 x 64
+
+  - [-1, 1, Spatial_Attention, [64, 128]]           # 1:        160 x 160 x 128
+  - [-1, 3, C2f, [128, True]]                       # 2:        160 x 160 x 128   @1    6
+  
+  - [-1, 1, Spatial_Attention, [128, 240]]          # 3:        80 x 80 x 256
+  - [-1, 3, C2f, [240, True]]                       # 4:        80 x 80 x 256     @2    9
+
+  - [-1, 1, Spatial_Attention, [240, 360]]          # 5:        40 x 40 x 512
+  - [-1, 3, C2f, [360, True]]                       # 6:        40 x 40 x 512     @3    9
+
+  - [-1, 1, Spatial_Attention, [360, 480]]         # 7:        20 x 20 x 1024
+  - [-1, 3, C2f, [480, True]]                      # 8:        20 x 20 x 1024    @4    6
+
+  - [-1, 1, SPPF, [480, 5]]                        # 9:        20 x 20 x 1024    @5
+  
+# YOLOv8.l head
+head:
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]      # 10:       40 x 40 x 1024
+  - [6, 1, Contigous_Att, [360, 360]]              # 11:       40 x 40 x 1024
+  - [[-1, 10], 1, Concat, [1]]                      # 12:       (@2)40 x 40 x 2048
+  - [-1, 3, C2f, [360, True]]                       # 13:       (C2F) 40 x 40 x 512     6
+
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]      # 14:       80 x 80 x 512
+  - [4, 1, Contigous_Att, [240, 240]]               # 15:       80 x 80 x 512
+  - [[-1, 14], 1, Concat, [1]]                      # 16:       (@1) 80 x 80 x 1024
+  - [-1, 3, C2f, [240, True]]                       # 17:       80 x 80 x 256           6
+
+  - [-1, 1, CBS, [240, 360, 3, 2]]                      # 18:       40 x 40 x 512
+  - [[-1, 13], 1, Concat, [1]]                      # 19:       (C2F)40 x 40 x 1024
+  - [-1, 3, C2f, [360, True]]                       # 20:       40 x 40 x 512           6
+
+  - [-1, 1, CBS, [360, 480, 3, 2]]                      # 21:       20 x 20 x 1024
+  - [9, 1, Contigous_Att, [480, 480]]             # 22:       20 x 20 x 2048
+  - [[-1, 21], 1, Concat, [1]]                      # 23:       20 x 20 x 2560
+  - [-1, 3, C2f, [480, True]]                      # 24:       20 x 20 x 1024          6
+
+  - [[13, 17, 20, 24], 1, Detect, [nc]]                 # Detect (C2F, C2F, C2F)
+  
+

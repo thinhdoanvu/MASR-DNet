@@ -1,0 +1,39 @@
+# YOLO Custom Configuration for 800x800 Input
+nc: 1
+depth_multiple: 1.0
+width_multiple: 1.0
+
+backbone:
+  # [from, repeats, module, args]
+  - [ -1, 1, Conv, [ 40, 3, 2 ] ]                       # 0-P1/2 (400x400) - Tăng nhẹ channels đầu vào
+  - [ -1, 1, MyDCNv2, [ 40, 80, 3, 2 ] ]                # 1-P2/4 (200x200)
+  - [ -1, 1, RepNCSPELAN4, [ 160, 160, 80, 1 ] ]        # 2
+
+  - [ -1, 1, MyDCNv2, [ 160, 256, 3, 2 ] ]              # 3-P3/8 (100x100)
+  - [ -1, 1, RepNCSPELAN4, [ 256, 256, 128, 1 ] ]       # 4
+
+  - [ -1, 1, Spatial_Attention, [ 256, 384 ] ]          # 5-P4/16 (50x50)
+  - [ -1, 1, RepNCSPELAN4, [ 384, 384, 192, 1 ] ]       # 6
+
+  - [ -1, 1, Spatial_Attention, [ 384, 512 ] ]          # 7-P5/32 (25x25)
+  - [ -1, 1, RepNCSPELAN4, [ 512, 512, 256, 1 ] ]       # 8
+
+  - [ -1, 1, SPPELAN, [ 512, 256 ] ]                    # 9 (25x25)
+
+head:
+  # --- Cấu trúc Head tối ưu cho ảnh 800x800 ---
+  - [ -1, 1, ASPP, [ 512, 512 ] ]                       # 10 (25x25) - Tầm nhìn đa quy mô sâu nhất
+
+  # --- Nhánh P4 (50x50) ---
+  - [ -1, 1, nn.Upsample, [ None, 2, "nearest" ] ]      # 11 (50x50)
+  - [ 6, 1, MySRBlock, [ 384, 384 ] ]                   # 12 Tinh chỉnh từ nhánh Skip-connection
+  - [ [ -1, -2 ], 1, Concat, [ 1 ] ]                    # 13 (512 + 384 = 896 channels)
+  - [ -1, 1, RepNCSPELAN4, [ 512, 384, 192, 1 ] ]       # 14 (50x50)
+
+  # --- Nhánh P3 (100x100) - "Trái tim" phát hiện vật nhỏ ---
+  - [ -1, 1, nn.Upsample, [ None, 2, "nearest" ] ]      # 15 (100x100)
+  - [ 4, 1, MySRBlock, [ 256, 256 ] ]                   # 16 Tinh chỉnh tầng nông cực nét
+  - [ [ -1, -2 ], 1, Concat, [ 1 ] ]                    # 17 (384 + 256 = 640 channels)
+  - [ -1, 1, RepNCSPELAN4, [ 640, 256, 128, 1 ] ]       # 18 (100x100)
+
+  - [ [ 14, 18 ], 1, Detect, [ nc ] ]                   # 19

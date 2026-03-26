@@ -1,0 +1,47 @@
+# Thay thế ASPP bằng SPPF, PSA, C2PSA, không có ASPP để so sánh hiệu quả
+scales:
+  # [depth, width, max_channels]
+  l: [1.00, 1.00, 1024] # summary: 526 layers, 15,389,553 parameters, 15,389,537 gradients, 72.1 GFLOPs
+
+
+nc: 1
+
+backbone:
+  # [from, repeats, module, args]
+  - [ -1, 1, Conv, [ 32, 3, 2 ] ]                       # 0-P1/2 (400x400)
+  - [ -1, 1, Conv, [ 64, 3, 2 ] ]                       # 1-P2/4 (200x200)
+  - [ -1, 1, RepNCSPELAN4, [ 64, 128, 64, 1 ] ]         # 2-P2/4
+
+  - [ -1, 1, Conv, [ 240, 3, 2 ] ]                      # 3-P3/8 (100x100)
+  - [ -1, 1, RepNCSPELAN4, [ 240, 240, 120, 1 ] ]       # 4-P3/8
+
+  - [ -1, 1, MyDCNv2, [ 240, 360, 3, 2 ] ]              # 5-P4/16 (50x50)
+  - [ -1, 1, RepNCSPELAN4, [ 360, 360, 180, 1 ] ]       # 6-P4/16
+
+  - [ -1, 1, MyDCNv2, [ 360, 480, 3, 2 ] ]              # 7-P5/32 (25x25) #-- Thay doi 360-> 480 de tang so kenh dau ra DCNv2 nhưng chưa thử
+  - [ -1, 1, RepNCSPELAN4, [ 480, 480, 240, 1 ] ]       # 8-P5/32
+  - [ -1, 1, SPPELAN, [ 480, 240 ] ]                    # 9-P5/32
+
+head:
+  # --- Nhanh P4 (50x50) ---
+  - [ -1, 1, C2PSA, [ 480 ] ]                           # 10 (25x25 -> 25x25) # bat buoc so kenh = nhau
+  - [ -1, 1, nn.Upsample, [ None, 2, "nearest" ] ]      # 11 (50x50)
+  - [ 6, 1, MySRBlock, [ 360, 360 ] ]                   # 12
+  - [ [ -1, -2 ], 1, Concat, [ 1 ] ]                    # 13 (480+360=840)
+  - [ -1, 1, RepNCSPELAN4, [ 360, 360, 180, 1 ] ]       # 14 (P4-Detection)
+
+  # --- Nhanh P3 (100x100) ---
+  - [ -1, 1, nn.Upsample, [ None, 2, "nearest" ] ]      # 15 (100x100)
+  - [ 4, 1, MySRBlock, [ 240, 240 ] ]                   # 16
+  - [ [ -1, -2 ], 1, Concat, [ 1 ] ]                    # 17 (360+240=600)
+  - [ -1, 1, RepNCSPELAN4, [ 240, 240, 120, 1 ] ]       # 18 (P3-Detection)
+#
+#   --- Tinh chinh DCNv2 cho Detect ---
+  - [ 14, 1, Spatial_Attention, [ 360, 360 ] ]          # 19 (Tinh chinh P4 truoc detect)
+  - [ 18, 1, Spatial_Attention, [ 240, 240 ] ]          # 20 (Tinh chinh P3 truoc detect)
+
+  - [ [ 20, 19 ], 1, Detect, [ nc ] ]                   # 21 (Detect 2 head: P3, P4)
+
+  # Tầng càng sâu, kích thước càng nhỏ (20x20, 40x40) chỉ dành cho các đối tượng lớn (chiếm gần hết khung hình)
+  # Tầng trung bình (80x80) dành cho các đối tượng vừa (chiếm khoảng nửa khung hình)
+  # Tầng nông nhất (160x160) dành cho các đối tượng nhỏ (chiếm ít không gian trong khung hình)

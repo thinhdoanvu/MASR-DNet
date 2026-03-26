@@ -1,0 +1,48 @@
+# YOLOv12 l + ASPP + MySRBlock + MyDCNv2
+
+nc: 1
+scales:
+  # [depth, width, max_channels]
+  l: [1.00, 1.00, 1024] # summary: # summary: 630 layers, 39,557,347 parameters, 0 gradients, 121.2 GFLOPs
+
+
+# YOLO12-turbo backbone
+backbone:
+  # [from, repeats, module, args]
+  - [-1, 1, Conv, [64, 3, 2]]                           # 0 320x320x64    P1/2
+  - [-1, 1, Conv, [128, 3, 2]]                          # 1 160x160x128   P2/4
+  - [-1, 2, C3k2, [256, False, 0.25]]                   # 2 160x160x256
+
+  - [-1, 1, Conv, [256, 3, 2]]                          # 3 80x80x256     P3/8
+  - [-1, 2, C3k2, [512, False, 0.25]]                   # 4 80x80x512  
+
+  - [-1, 1, MyDCNv2, [512, 512, 3, 2]]                  # 5 40x40x512     P4/16
+  - [-1, 4, A2C2f, [512, True, 4]]                      # 6 40x40x512
+
+  - [-1, 1, MyDCNv2, [512,1024,  3, 2]]                 # 7 20x20x1024    P5/32
+  - [-1, 4, A2C2f, [1024, True, 1]]                     # 8 20x20x1024
+
+
+# YOLO12-turbo head
+head:
+  - [ -1, 1, ASPP, [ 1024, 512 ] ]                      # 9 20x20x512
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]          # 10 40x40x512
+  - [ 6, 1, MySRBlock, [ 512, 512 ] ]                   # 11 40x40x512
+  - [[-1, -2], 1, Concat, [1]]                          # 12 40x40x1024
+  - [-1, 2, A2C2f, [512, False, -1]]                    # 13 40x40x512 P4-medium
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]          # 14 80x80x512
+  - [ 4, 1, MySRBlock, [ 512, 512 ] ]                   # 15 80x80x512
+  - [[-1, 4], 1, Concat, [1]]                           # 16 80x80x1024
+  - [-1, 2, A2C2f, [256, False, -1]]                    # 17 80x80x256 P3-small
+
+#   --- Tinh chinh DCNv2 cho Detect ---
+  - [ 14, 1, Spatial_Attention, [ 512, 512 ] ]          # 18 40x40x512
+  - [ 17, 1, Spatial_Attention, [ 256, 256 ] ]          # 19 80x80x256
+
+  - [ [ 19, 18 ], 1, Detect, [ nc ] ]                   # 20 (Detect 2 head: P3, P4)
+
+  # Tầng càng sâu, kích thước càng nhỏ (20x20, 40x40) chỉ dành cho các đối tượng lớn (chiếm gần hết khung hình)
+  # Tầng trung bình (80x80) dành cho các đối tượng vừa (chiếm khoảng nửa khung hình)
+  # Tầng nông nhất (160x160) dành cho các đối tượng nhỏ (chiếm ít không gian trong khung hình)
+

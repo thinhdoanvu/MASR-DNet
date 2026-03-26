@@ -1,0 +1,37 @@
+# Parameters
+nc: 80 # number of classes
+
+# GELAN backbone
+backbone:
+  - [-1, 1, Conv, [32, 3, 2]] # 0-P1/2
+  - [-1, 1, Conv, [64, 3, 2]] # 1-P2/4
+  - [-1, 1, RepNCSPELAN4, [128, 128, 64, 1]] # 2
+  - [-1, 1, AConv, [240]] # 3-P3/8
+  - [-1, 1, RepNCSPELAN4, [240, 240, 120, 1]] # 4
+  - [-1, 1, AConv, [360]] # 5-P4/16
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]] # 6
+  - [-1, 1, AConv, [480]] # 7-P5/32
+  - [-1, 1, RepNCSPELAN4, [480, 480, 240, 1]] # 8
+  - [-1, 1, SPPELAN, [480, 240]] # 9 OUTPUT 480
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [ 6, 1, WAFU, [ 360, 360 ] ]
+  - [[-1, -2], 1, Concat, [1]] # cat backbone P4
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]] # 13
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [ 4, 1, WAFU, [ 240, 240 ] ]
+  - [[-1, -2], 1, Concat, [1]] # cat backbone P3
+  - [-1, 1, RepNCSPELAN4, [240, 240, 120, 1]] # 17
+
+  - [-1, 1, AConv, [180]]
+  - [[-1, 13], 1, Concat, [1]] # cat head P4
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]] # 20 (P4/16-medium)
+
+  - [-1, 1, AConv, [240]]
+  - [[-1, 9], 1, Concat, [1]] # cat head P5
+  - [-1, 1, RepNCSPELAN4, [480, 480, 240, 1]] # 24 (P5/32-large)
+
+  - [[17, 20, 23], 1, Detect, [nc]] # Detect(P3, P4, P5)
+

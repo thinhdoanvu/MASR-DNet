@@ -1,0 +1,45 @@
+# YOLO-Light-Small-Optimized.yaml
+# Lightweight YOLO for small object detection with Ghost, DCNv2, SR-Block, WAFU + ROI Attention
+
+nc: 1  # number of classes (edit for your dataset)
+depth_multiple: 1
+width_multiple: 1
+
+backbone:
+  # [from, repeats, module, args]
+  - [-1, 1, Conv, [64, 3, 2]]                # 0-P1/2
+  - [-1, 1, MyGhost, [64, 128, 3, 1]]        # 1
+  - [-1, 1, MyGhost, [128, 128, 3, 2]]       # 2-P2/4
+  - [-1, 1, ROIAttentionBlock, [128, 128]]   # 3
+
+  - [-1, 1, MyDCNv2, [128, 256, 3, 2]]       # 4-P3/8
+  - [-1, 1, ROIAttentionBlock, [256, 256]]   # 5
+
+  - [-1, 1, MyDCNv2, [256, 512, 3, 2]]       # 6-P4/16
+  - [-1, 1, ROIAttentionBlock, [512, 512]]   # 7
+
+  - [-1, 1, MyDCNv2, [512, 512, 3, 2]]       # 8-P5/32 (giảm từ 1024 → 512)
+  - [-1, 1, ROIAttentionBlock, [512, 512]]   # 9
+  - [-1, 1, SPPELAN, [512, 512]]             # 10
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]   # 11
+  - [[-1, 7], 1, Concat, [1]]                    # 12 (512 + 512 = 1024)
+  - [-1, 1, WAFU, [1024, 512]]      # 13
+
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]   # 14
+  - [[-1, 5], 1, Concat, [1]]                    # 15 (512 + 256 = 768)
+  - [-1, 1, WAFU, [768, 256]]       # 16
+
+  - [-1, 1, MyDCNv2, [256, 256, 3, 2]]           # 17
+  - [[-1, 12], 1, Concat, [1]]                   # 18 (256 + 512 = 768)
+  - [-1, 1, WAFU, [1280, 512]]      # 19
+
+  - [-1, 1, MyDCNv2, [512, 512, 3, 2]]           # 20
+  - [[-1, 10], 1, Concat, [1]]                   # 21 (512 + 512 = 1024)
+  - [-1, 1, WAFU, [1024, 1024]]      # 22 (giảm từ 1024 → 512)
+
+  - [16, 1, WAFU_ROIAttention, [256, 256]]
+  - [19, 1, WAFU_ROIAttention, [512, 512]]
+  - [22, 1, WAFU_ROIAttention, [1024, 1024]]
+  - [[23, 24, 25], 1, Detect, [nc]]              # Detect at P3=256, P4=512, P5=512

@@ -1,0 +1,50 @@
+# Image size = 640x640x3
+# output = min(max_channels, channel input)x width
+#hsdpa_ca summary: 283 layers, 84,561,475 parameters, 83,728,670 gradients, 183.6 GFLOPs
+#Class     Images  Instances      Box(P      R        mAP50    mAP50-95)
+#all       1329       1621        0.593      0.632    0.657    0.434
+#Speed: 0.1ms preprocess, 2.2ms inference, 0.0ms loss, 0.9ms postprocess per image
+
+nc: 102  # number of classes
+scales: # model C2f by True
+  # [depth, width, max_channels]
+  ex: [0.33, 1.00, 1024]
+  
+
+# YOLOv8.l backbone
+backbone:
+  # [from, repeats, module, args]
+  - [-1, 1, Conv, [64, 3, 2]]                       # 0-P1/2
+  - [-1, 1, Conv, [128, 3, 2]]                      # 1-P2/4
+  - [-1, 3, C2f, [128, True]]
+  - [-1, 1, Conv, [256, 3, 2]]                      # 3-P3/8
+  - [-1, 6, C2f, [256, True]]
+  - [-1, 1, Conv, [512, 3, 2]]                      # 5-P4/16
+  - [-1, 6, C2f, [512, True]]
+  - [-1, 1, Conv, [1024, 3, 2]]                     # 7-P5/32
+  - [-1, 3, C2f, [1024, True]]
+  - [-1, 1, SPPF, [1024, 5]]                        # 9
+  
+# YOLOv8.l head
+head:
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]      # 10:       40 x 40 x 1024
+  - [6, 1, ConvCA, [512, 1024]]                     # 11:       40 x 40 x 1024
+  - [[-1, 10], 1, Concat, [1]]                      # 12:       (@2)40 x 40 x 2048
+  - [-1, 6, C2f, [512, True]]                       # 13:       (C2F) 40 x 40 x 512
+
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]      # 14:       80 x 80 x 512
+  - [4, 1, ConvCA, [256, 512]]                      # 15:       80 x 80 x 512
+  - [[-1, 14], 1, Concat, [1]]                      # 16:       (@1) 80 x 80 x 1024
+  - [-1, 6, C2f, [256, True]]                       # 17:       80 x 80 x 256
+
+  - [-1, 1, Conv, [256, 3, 2]]                      # 18:       40 x 40 x 512
+  - [[-1, 13], 1, Concat, [1]]                      # 19:       (C2F)40 x 40 x 1024
+  - [-1, 6, C2f, [512, True]]                       # 20:       40 x 40 x 512
+
+  - [-1, 1, Conv, [512, 3, 2]]                      # 21:       20 x 20 x 1024
+  - [9, 1, ConvCA, [1024, 2048]]                    # 22:       20 x 20 x 2048
+  - [[-1, 21], 1, Concat, [1]]                      # 23:       20 x 20 x 2560
+  - [-1, 6, C2f, [1024, True]]                      # 24:       20 x 20 x 1024
+
+  - [[17, 20, 24], 1, Detect, [nc]]                 # Detect (C2F, C2F, C2F)
+

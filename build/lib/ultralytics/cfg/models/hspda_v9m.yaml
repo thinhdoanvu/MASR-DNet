@@ -1,0 +1,134 @@
+#hspda_v9m summary (fused): 496 layers, 28,013,968 parameters, 0 gradients, 142.4 GFLOPs
+#Class     Images  Instances      Box(P          R      mAP50  mAP50-95)
+#all       1329       1621      0.556      0.649      0.672       0.44
+      rice leaf roller         12         13      0.667          1      0.935      0.642
+ rice leaf caterpillar          8          8      0.604      0.375      0.447      0.277
+     paddy stem maggot          2          2      0.495        0.5      0.497      0.254
+    asiatic rice borer         12         13      0.619      0.769      0.786      0.473
+     yellow rice borer          6          6      0.928          1      0.995      0.622
+       rice gall midge          7          7      0.559      0.857       0.89      0.409
+          Rice Stemfly          2          2      0.563      0.689      0.828      0.445
+    brown plant hopper          8          8       0.62      0.613       0.58      0.364
+white backed plant hopper          5          5      0.593          1      0.962      0.584
+small brown plant hopper          4          4      0.352        0.5      0.619      0.362
+     rice water weevil         11         11       0.57      0.967      0.626      0.424
+       rice leafhopper          8          8      0.891       0.75      0.768      0.376
+ grain spreader thrips          1          1          0          0      0.199     0.0597 #
+       rice shell pest          3          3      0.562      0.667       0.72      0.429
+                  grub         31         68      0.896      0.926      0.963      0.513
+          mole cricket         61         61      0.987          1      0.995      0.664
+              wireworm         30         33      0.657      0.879       0.83      0.584
+   white margined moth          3          4      0.204       0.25      0.187       0.13
+         black cutworm         21         21      0.402      0.952      0.655      0.572
+         large cutworm         11         14      0.453      0.429      0.595      0.536
+        yellow cutworm         14         14      0.335      0.286       0.38      0.337
+            red spider         11         11      0.569      0.909      0.718      0.562
+            corn borer         30         31      0.672      0.839      0.801      0.585
+             army worm         14         17      0.446      0.522        0.6      0.412
+                aphids         62        111      0.603      0.795      0.725      0.393
+   Potosiabre vitarsis         14         20       0.82        0.7       0.77      0.533
+           peach borer         17         17       0.72      0.765      0.809       0.58
+   english grain aphid          9         23      0.191      0.174      0.274       0.14 #
+             green bug          2          2          1          0     0.0614     0.0439 #
+  bird cherry-oataphid          5          6     0.0756      0.167      0.144     0.0817
+   wheat blossom midge          2          2      0.772        0.5      0.828      0.497
+      penthaleus major          5          5      0.828       0.97      0.962      0.553
+longlegged spider mite          4          4      0.467        0.5      0.377      0.216
+    wheat phloeothrips          6          6      0.396      0.667      0.557      0.396
+          wheat sawfly         10         11      0.959      0.636      0.774      0.428
+ cerodonta denticornis          2          2      0.477          1      0.828       0.68
+              beet fly          2          2          0          0      0.181     0.0896
+           flea beetle         24         27      0.794      0.963       0.95      0.617
+     cabbage army worm         17         17      0.204      0.235        0.3      0.239
+        beet army worm         29         29      0.482       0.69       0.65      0.459
+       Beet spot flies          5          5      0.472        0.8       0.75      0.513
+           meadow moth          7          8      0.144      0.171       0.13     0.0971
+           beet weevil         10         11      0.434      0.727      0.595      0.326
+sericaorient alismots chulsky          6         11      0.884      0.455      0.653      0.374
+        alfalfa weevil          6          7      0.435      0.429      0.541        0.4
+          flax budworm         29         31      0.381      0.418      0.356      0.246
+     alfalfa plant bug         16         16      0.532      0.625       0.45      0.239
+   tarnished plant bug         24         24      0.594      0.667      0.639      0.427
+           Locustoidea         37         39      0.561      0.692      0.691      0.363
+          lytta polita         17         21      0.502      0.286      0.498      0.243
+ legume blister beetle         30         32      0.568      0.822      0.646      0.335
+        blister beetle         65         66      0.692      0.833      0.794      0.414
+     odontothrips loti          5          5      0.617        0.6       0.72      0.469
+                Thrips          3          3      0.284      0.333      0.198      0.152
+  alfalfa seed chalcid          1          1      0.526          1      0.995      0.796
+        Pieris canidia          4          4      0.272       0.25      0.281      0.169
+      Apolygus lucorum          2          2      0.459          1      0.745      0.398
+           Limacodidae          7         30          1          0     0.0958     0.0469
+   oides decempunctata          9         13      0.772      0.846      0.863      0.512
+Pseudococcus comstocki Kuwana          4          4      0.472          1      0.912      0.622
+    parathrene regalis          2          2      0.605          1      0.995      0.822
+           Ampelophaga         20         20      0.788        0.9      0.909      0.668
+    Lycorma delicatula         24         24       0.97      0.958       0.98      0.668
+           Xylotrechus         11         11       0.86          1      0.995      0.771
+     Cicadella viridis         14         14      0.695      0.857      0.835      0.562
+               Miridae         89         89      0.695       0.82      0.808        0.5
+Trialeurodes vaporariorum          7          7      0.373      0.571       0.49      0.426
+ Erythroneura apicalis          1          1      0.654          1      0.995      0.597
+        Papilio xuthus          7          8      0.396      0.875      0.742      0.465
+Panonchus citri McGregor          3          5      0.458      0.682      0.711      0.378
+Icerya purchasi Maskell         11         29      0.737      0.897      0.914       0.51
+    Unaspis yanonensis          2         45      0.725       0.88      0.929      0.391
+    Ceroplastes rubens          5         26      0.625      0.641      0.695       0.34
+ Chrysomphalus aonidum          3          6      0.602      0.833      0.879      0.477
+  Nipaecoccus vastalor          2          2       0.21        0.5      0.373      0.123
+Aleurocanthus spiniferus          4         23      0.476      0.304      0.365      0.179
+Tetradacus c Bactrocera minax           3          7      0.542      0.571      0.745      0.336
+Dacus dorsalis(Hendel)          8          8      0.734          1      0.967      0.773
+  Bactrocera tsuneonis          2          2          0          0      0.208      0.169
+       Prodenia litura         29         32      0.601      0.719      0.747      0.492
+         Adristyrannus          9          9      0.371      0.444      0.584      0.482
+Phyllocnistis citrella Stainton          2          2      0.738          1      0.995      0.722
+  Toxoptera citricidus          1          1      0.254          1      0.995      0.697
+    Toxoptera aurantii          2          2      0.599          1      0.995      0.697
+Scirtothrips dorsalis Hood          5          5      0.214        0.2      0.451      0.327
+          Dasineura sp          2          2          0          0      0.332       0.27
+Lawana imitata Melichar          9         11      0.603      0.829      0.774      0.597
+Salurnis marginella Guerr         12         13      0.681      0.846      0.888      0.662
+Deporaus marginatus Pascoe          4          4      0.364       0.25      0.401      0.295
+  Chlumetia transversa          4          4      0.629       0.75      0.693      0.624
+Mango flat beak leafhopper          1          1          1          0      0.995      0.697
+Rhytidodera bowrinii white         10         10       0.82        0.8      0.882      0.696
+ Sternochetus frigidus          4          4      0.365        0.5      0.632       0.53
+          Cicadellidae        206        210       0.87      0.957      0.963       0.74
+#Speed: 0.1ms preprocess, 7.8ms inference, 0.0ms loss, 0.7ms postprocess per image
+
+nc: 80 # number of classes
+
+# GELAN backbone
+backbone:
+  - [-1, 1, Conv, [32, 3, 2]]                       # 0-P1/2
+  - [-1, 1, Conv, [64, 3, 2]]                       # 1-P2/4
+  - [-1, 1, RepNCSPELAN4, [128, 128, 64, 1]]        # 2
+  - [-1, 1, Spatial_Attention, [128, 240]]          # 3-P3/8
+  - [-1, 1, RepNCSPELAN4, [240, 240, 120, 1]]       # 4
+  - [-1, 1, Spatial_Attention, [240, 360]]          # 5-P4/16
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]]       # 6
+  - [-1, 1, Spatial_Attention, [360, 480]]          # 7-P5/32
+  - [-1, 1, RepNCSPELAN4, [480, 480, 240, 1]]       # 8
+  - [-1, 1, SPPELAN, [480, 240]]                    # 9
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      #10: 240x2=480
+  - [[-1, 6], 1, Concat, [1]]                       # cat backbone P4: 480+360=840
+  - [-1, 1, Contigous_Att, [840, 360]]              #12
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]]       # 13
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      #14: 360x2=600?
+  - [[-1, 4], 1, Concat, [1]]                       # cat backbone P3:720+240=960
+  - [-1, 1, Contigous_Att, [600, 240]]              #16
+  - [-1, 1, RepNCSPELAN4, [240, 240, 120, 1]]       # 17
+
+  - [-1, 1, AConv, [180]]
+  - [[-1, 13], 1, Concat, [1]]                      # cat head P4
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]]       # 20 (P4/16-medium)
+
+  - [-1, 1, AConv, [240]]
+  - [[-1, 9], 1, Concat, [1]]                       # cat head P5
+  - [-1, 1, RepNCSPELAN4, [480, 480, 240, 1]]       # 23 (P5/32-large)
+
+  - [[17, 20, 23], 1, Detect, [nc]]                 # Detect(P3, P4, P5)

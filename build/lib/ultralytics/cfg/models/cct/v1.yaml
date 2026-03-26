@@ -1,0 +1,44 @@
+# YOLO-Light-Small.yaml
+# Lightweight YOLO for small object detection with Ghost, DCNv2, SR-Block
+
+nc: 16  # number of classes (edit for your dataset)
+depth_multiple: 0.33
+width_multiple: 0.50
+
+backbone:
+  # [from, repeats, module, args]
+  - [-1, 1, Conv, [64, 3, 2]]      # 0-P1/2
+  - [-1, 1, Ghost, [128, 3, 1]]    # 1
+  - [-1, 1, Ghost, [128, 3, 2]]    # 2-P2/4
+  - [-1, 3, C2f, [128]]            # 3
+
+  - [-1, 1, DCNv2, [256, 3, 2]]    # 4-P3/8
+  - [-1, 6, C2f, [256]]            # 5
+
+  - [-1, 1, DCNv2, [512, 3, 2]]    # 6-P4/16
+  - [-1, 9, C2f, [512]]            # 7
+
+  - [-1, 1, DCNv2, [1024, 3, 2]]   # 8-P5/32
+  - [-1, 3, C2f, [1024]]           # 9
+  - [-1, 1, SPPF, [1024, 5]]       # 10
+
+head:
+
+  - [-1, 1, SRBlock, [1024]]       # 11 enhance small features
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]   # 12
+  - [[-1, 7], 1, Concat, [1]]      # 13 cat backbone P4
+  - [-1, 3, C2f, [512]]            # 14
+
+  - [-1, 1, nn.Upsample, [None, 2, 'nearest']]   # 15
+  - [[-1, 5], 1, Concat, [1]]      # 16 cat backbone P3
+  - [-1, 3, C2f, [256]]            # 17 (P3/8 small)
+
+  - [-1, 1, DCNv2, [256, 3, 2]]    # 18
+  - [[-1, 14], 1, Concat, [1]]     # 19 cat P4
+  - [-1, 3, C2f, [512]]            # 20 (P4/16 medium)
+
+  - [-1, 1, DCNv2, [512, 3, 2]]    # 21
+  - [[-1, 10], 1, Concat, [1]]     # 22 cat P5
+  - [-1, 3, C2f, [1024]]           # 23 (P5/32 large)
+
+  - [[17, 20, 23], 1, Detect, [nc]]  # Detect at P3, P4, P5

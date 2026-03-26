@@ -1,0 +1,38 @@
+nc: 1 # number of classes
+
+
+backbone:
+  - [ -1, 1, Conv, [ 32, 3, 2 ] ]                       # 0- 320x320x3
+  - [ -1, 1, Conv, [ 64, 3, 2 ] ]                          # 1- 160x160x64
+  - [ -1, 1, RepNCSPELAN4, [ 128, 128, 64, 1 ] ]        # 2
+  - [ -1, 1, Spatial_Attention, [ 128, 240 ] ]          # 3-80 80x80x240
+  - [ -1, 1, RepNCSPELAN4, [ 240, 240, 120, 1 ] ]       # 4
+  - [ -1, 1, Spatial_Attention, [ 240, 360 ] ]          # 5-40 40x40x360
+  - [ -1, 1, RepNCSPELAN4, [ 360, 360, 180, 1 ] ]       # 6
+  - [ -1, 1, Spatial_Attention, [ 360, 480 ] ]          # 7-20 20x20x480
+  - [ -1, 1, RepNCSPELAN4, [ 480, 480, 240, 1 ] ]       # 8
+  - [ -1, 1, SPPELAN, [ 480, 240 ] ]                    # 9 20x20x480
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 10 40x40x1024
+  - [6, 1, MySRBlock, [360, 360]]                   # 11
+  - [ [ -1, -2 ], 1, Concat, [ 1 ] ]                # 12
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]]       # 13
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 14 80x80x1024
+  - [4, 1, MySRBlock, [240, 240]]                   # 15
+  - [[-1, -2], 1, Concat, [1]]                      # 16
+  - [-1, 1, RepNCSPELAN4, [240, 240, 120, 1]]       # 17
+
+  - [-1, 1, AConv, [180]]                           # 18 40x40x256,  nho + 4
+  - [13, 1, ASPP, [360, 360]]                       # 19
+  - [[-1, -2], 1, Concat, [1]]                      # 20 Medium khong can
+  - [-1, 1, RepNCSPELAN4, [360, 360, 180, 1]]       # 21
+
+  - [-1, 1, AConv, [240]]                           # 22 20x20x512,  tinh dung
+  - [9, 1, ASPP, [480, 480]]                        # 23
+  - [[-1, -2], 1, Concat, [1]]                      # 24
+  - [-1, 1, RepNCSPELAN4, [480, 480, 240, 1]]       # 25
+
+  - [[13, 17, 21, 25], 1, Detect, [nc]]             # 24 Detect
+
