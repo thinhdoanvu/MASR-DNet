@@ -11,7 +11,8 @@ The proposed framework underwent rigorous evaluation on the AICUP 2025 (Cardiac 
 
 ---
 # Architecture of the proposed MASR-DNet.  
-<img width="1316" height="775" alt="image" src="https://github.com/user-attachments/assets/ef92d7ba-6d84-452b-81b7-225269ac7511" />
+<img width="2024" height="996" alt="image" src="https://github.com/user-attachments/assets/bf7f1462-3326-4449-b14c-5e824a4ca760" />
+
 
 ---
 # Geometric Adaptive Deformable Convolution module
