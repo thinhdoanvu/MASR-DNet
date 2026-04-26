@@ -2,7 +2,7 @@
 
 **A Deformable Multi-scale Spatial Context Attention Network for Aortic Valve Detection in CT and Cardiomegaly Localization in Chest X-ray Images**
 
-> Paper under review at *Biomedical Signal Processing and Control* (Elsevier, Q1)
+> Paper under review at *Biomedical Signal Processing and Control*
 
 ---
 
@@ -24,7 +24,7 @@ Both results are the highest among 17 compared baselines (two-stage, transformer
 | Module | Role |
 |---|---|
 | **GADC** — Geometry-Aware Deformable Convolution | Adaptive spatial sampling for irregular cardiac boundaries |
-| **ASPP+** — Enhanced Atrous Spatial Pyramid Pooling | Multi-scale context aggregation with strip pooling |
+| **EASPP** — Enhanced Atrous Spatial Pyramid Pooling | Multi-scale context aggregation with strip pooling |
 | **MSRF** — Multi-scale Residual Fusion | Cross-resolution feature alignment via PixelShuffle |
 | **HSA** — Hybrid Spatial Attention | Coordinate + dilated branch attention for positional focus |
 | **ASCL** — Adaptive Supervised Contrastive Loss | Foreground–background separation under extreme class imbalance |
@@ -118,7 +118,7 @@ If you find this work useful, please cite:
 
 ```bibtex
 @article{MASRDNet2026,
-  author  = {Vu Thinh Doan and others},
+  author  = {Vu Thinh Doan and Jonnagaddala Jitendra and Thi Thu Thuy Pham and Dinh HUng Nguyen and Hong-Jie Dai},
   title   = {MASR-DNet: A Deformable Multi-scale Spatial Context Attention Network
              for Aortic Valve Detection in CT and Cardiomegaly Localization
              in Chest X-ray Images},
